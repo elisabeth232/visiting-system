@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — School Visitor App{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px; color: #0d6efd;">Dashboard — {{ today|date:"l, F j, Y" }}</h2>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ parents_inside }}</div>
+        <div class="stat-label">Parents Currently Inside</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color: #198754;">{{ teachers_today }}</div>
+        <div class="stat-label">Teachers Checked In Today</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color: #ffc107;">{{ visits_today }}</div>
+        <div class="stat-label">Total Parent Visits Today</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color: #6c757d;">{{ total_students }}</div>
+        <div class="stat-label">Enrolled Students</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Currently Inside (Parents)</h2>
+    {% if active_visits %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Parent</th>
+                <th>Relationship</th>
+                <th>Phone</th>
+                <th>Entry Time</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for visit in active_visits %}
+            <tr>
+                <td><strong>{{ visit.parent.student.name }}</strong></td>
+                <td>{{ visit.parent.name }}</td>
+                <td>{{ visit.parent.get_relationship_display }}</td>
+                <td>{{ visit.parent.phone_number }}</td>
+                <td>{{ visit.entry_time|date:"H:i" }}</td>
+                <td><span class="badge badge-warning">{{ visit.entry_time|timesince }} ago</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #6c757d;">No parents currently inside.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Recent Visits (last 10)</h2>
+    {% if recent_visits %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Parent</th>
+                <th>Entry</th>
+                <th>Exit</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for visit in recent_visits %}
+            <tr>
+                <td>{{ visit.parent.student.name }}</td>
+                <td>{{ visit.parent.name }}</td>
+                <td>{{ visit.entry_time|date:"H:i" }}</td>
+                <td>{% if visit.exit_time %}{{ visit.exit_time|date:"H:i" }}{% else %}—{% endif %}</td>
+                <td>
+                    {% if visit.status == 'entered' %}
+                        <span class="badge badge-warning">Inside</span>
+                    {% elif visit.status == 'exited' %}
+                        <span class="badge badge-success">Exited</span>
+                    {% else %}
+                        <span class="badge badge-danger">Expired</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #6c757d;">No visits recorded yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

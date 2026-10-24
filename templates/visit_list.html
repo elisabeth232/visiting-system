@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Visit Log — School Visitor App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Visit Log</h2>
+
+    <form method="get" style="display: flex; gap: 10px; align-items: end; margin-bottom: 20px; flex-wrap: wrap;">
+        <div>
+            <label style="display:block; font-size:13px; margin-bottom:6px; font-weight:600;">Filter by Date</label>
+            <input type="date" name="date" value="{{ filter_date }}">
+        </div>
+        <button type="submit" class="btn">Filter</button>
+        <a href="{% url 'visit_list' %}" class="btn btn-secondary">Clear</a>
+    </form>
+
+    {% if visits %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Student</th>
+                    <th>Parent</th>
+                    <th>Entry</th>
+                    <th>Exit</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visit in visits %}
+                <tr>
+                    <td>{{ visit.entry_time|date:"Y-m-d" }}</td>
+                    <td>{{ visit.parent.student.name }}</td>
+                    <td>{{ visit.parent.name }}</td>
+                    <td>{{ visit.entry_time|date:"H:i" }}</td>
+                    <td>{% if visit.exit_time %}{{ visit.exit_time|date:"H:i" }}{% else %}—{% endif %}</td>
+                    <td>
+                        {% if visit.status == 'entered' %}
+                            <span class="badge badge-warning">Inside</span>
+                        {% elif visit.status == 'exited' %}
+                            <span class="badge badge-success">Exited</span>
+                        {% else %}
+                            <span class="badge badge-danger">Expired</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: #6c757d;">No visits found for this date.</p>
+    {% endif %}
+</div>
+{% endblock %}

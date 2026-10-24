@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Teachers — School Visitor App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h2 style="margin: 0;">Teachers ({{ teachers.count }})</h2>
+        <a href="{% url 'teacher_add' %}" class="btn btn-success">+ Add Teacher</a>
+    </div>
+
+    {% if teachers %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Card UID</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr>
+                    <td><strong>{{ teacher.name }}</strong></td>
+                    <td>{{ teacher.phone_number|default:"—" }}</td>
+                    <td><code>{{ teacher.card_uid }}</code></td>
+                    <td>
+                        {% if teacher.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'teacher_edit' teacher.id %}" class="btn" style="padding: 6px 12px; font-size: 13px;">Edit</a>
+                        <a href="{% url 'teacher_delete' teacher.id %}" class="btn btn-danger" style="padding: 6px 12px; font-size: 13px;">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: #6c757d;">No teachers yet. Click "Add Teacher" to get started.</p>
+    {% endif %}
+</div>
+{% endblock %}

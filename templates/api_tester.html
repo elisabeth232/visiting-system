@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}API Tester — School Visitor App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>API Tester (for ESP32 Simulation)</h2>
+    <p style="color: #6c757d; margin-bottom: 20px;">
+        Use this page to test the RFID API without hardware.
+        Enter a card UID that exists in your Parents or Teachers list.
+    </p>
+
+    <div class="form-group">
+        <label>Card UID</label>
+        <input type="text" id="cardUid" placeholder="e.g. A1B2C3D4" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+    </div>
+
+    <div class="form-actions" style="margin-top:15px;">
+        <button class="btn btn-success" onclick="simulateSwipe()">Simulate Card Swipe</button>
+        <button class="btn" onclick="checkReminders()">Check Reminders</button>
+        <button class="btn btn-danger" onclick="forceEnd()">Force End All Visits</button>
+        <button class="btn btn-secondary" onclick="serverStatus()">Server Status</button>
+    </div>
+
+    <h2 style="margin-top: 30px; font-size: 16px;">Response</h2>
+    <pre id="output" style="background: #1e1e1e; color: #0f0; padding: 15px; border-radius: 6px; font-size: 12px; overflow-x: auto; min-height: 200px;"></pre>
+</div>
+
+<script>
+const output = document.getElementById('output');
+
+function show(data) {
+    output.textContent = JSON.stringify(data, null, 2);
+}
+
+function simulateSwipe() {
+    const uid = document.getElementById('cardUid').value.trim();
+    if (!uid) { alert('Enter a card UID first'); return; }
+    fetch('/api/rfid/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({card_uid: uid})
+    })
+    .then(r => r.json())
+    .then(show)
+    .catch(e => output.textContent = 'Error: ' + e);
+}
+
+function checkReminders() {
+    fetch('/api/reminder/')
+    .then(r => r.json())
+    .then(show)
+    .catch(e => output.textContent = 'Error: ' + e);
+}
+
+function forceEnd() {
+    if (!confirm('Force-expire all unfinished visits today?')) return;
+    fetch('/api/force-end/?force=1', {method: 'POST'})
+    .then(r => r.json())
+    .then(show)
+    .catch(e => output.textContent = 'Error: ' + e);
+}
+
+function serverStatus() {
+    fetch('/api/status/')
+    .then(r => r.json())
+    .then(show)
+    .catch(e => output.textContent = 'Error: ' + e);
+}
+</script>
+{% endblock %}

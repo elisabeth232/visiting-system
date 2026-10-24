@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Parents — School Visitor App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h2 style="margin: 0;">Parents ({{ parents.count }})</h2>
+        <a href="{% url 'parent_add' %}" class="btn btn-success">+ Add Parent</a>
+    </div>
+
+    {% if parents %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Student</th>
+                    <th>Relationship</th>
+                    <th>Phone</th>
+                    <th>National ID</th>
+                    <th>Card UID</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for parent in parents %}
+                <tr>
+                    <td><strong>{{ parent.name }}</strong></td>
+                    <td>{{ parent.student.name }}</td>
+                    <td>{{ parent.get_relationship_display }}</td>
+                    <td>{{ parent.phone_number }}</td>
+                    <td>{{ parent.national_id }}</td>
+                    <td><code>{{ parent.card_uid }}</code></td>
+                    <td>
+                        <a href="{% url 'parent_edit' parent.id %}" class="btn" style="padding: 6px 12px; font-size: 13px;">Edit</a>
+                        <a href="{% url 'parent_delete' parent.id %}" class="btn btn-danger" style="padding: 6px 12px; font-size: 13px;">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: #6c757d;">No parents yet. Add a student first, then add parents.</p>
+    {% endif %}
+</div>
+{% endblock %}
